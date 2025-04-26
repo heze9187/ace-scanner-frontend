@@ -23,7 +23,7 @@ const api = axios.create({
 // ✨ NEW — Always set X-CSRFToken manually
 api.interceptors.request.use((config) => {
   const csrfToken = getCookie('csrftoken');
-  if (csrfToken) {
+  if (csrfToken && ['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
     config.headers['X-CSRFToken'] = csrfToken;
   }
   return config;
