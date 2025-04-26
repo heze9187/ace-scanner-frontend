@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import api from '../api/api';
-import { getCsrfToken, getCookie} from "../api/api"; 
+import React, { useState, useEffect } from 'react';
+import api, { getCsrfToken, getCookie } from '../api/api';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
@@ -12,18 +11,21 @@ function LoginForm({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  // ⭐ Fetch CSRF token when page loads
+  useEffect(() => {
+    console.log("[LoginForm] Pre-fetching CSRF token...");
+    getCsrfToken();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await getCsrfToken();  // Make sure cookie is there
-  
-      const csrfToken = getCookie('csrftoken');  // Manually read it
-  
+      const csrfToken = getCookie('csrftoken');
+
       if (!csrfToken) {
         throw new Error("CSRF token missing!");
       }
-  
+
       await api.post(
         "auth/login/",
         { username, password },
@@ -34,7 +36,7 @@ function LoginForm({ onLoginSuccess }) {
           }
         }
       );
-  
+
       onLoginSuccess();
     } catch (error) {
       console.error("Login failed:", error);
@@ -57,6 +59,7 @@ function LoginForm({ onLoginSuccess }) {
                     placeholder="Enter username" 
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    required
                   />
                 </Form.Group>
 
@@ -67,6 +70,7 @@ function LoginForm({ onLoginSuccess }) {
                     placeholder="Enter password" 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    required
                   />
                 </Form.Group>
 
