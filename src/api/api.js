@@ -9,4 +9,12 @@ const api = axios.create({
   withCredentials: true,
 });
 
+export const getCsrfToken = async () => {
+  try {
+    await api.get('csrf/');
+  } catch (error) {
+    console.error('Error fetching CSRF token:', error);
+  }
+};
+
 export default api;

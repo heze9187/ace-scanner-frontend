@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api/api';
+import { getCsrfToken } from "../api/api"; 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
@@ -14,6 +15,7 @@ function LoginForm({ onLoginSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      await getCsrfToken();
       await api.post('auth/login/', { username, password });
       onLoginSuccess();
     } catch (error) {

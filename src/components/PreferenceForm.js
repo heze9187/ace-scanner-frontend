@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import api from "../api/api";
+import { getCsrfToken } from "../api/api"; 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -32,6 +33,8 @@ function PreferenceForm({ onSaveSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      await getCsrfToken();
+      
       const csrfToken = document.cookie
         .split("; ")
         .find((row) => row.startsWith("csrftoken="))
