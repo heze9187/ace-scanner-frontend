@@ -7,7 +7,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import api from "./api/api";
-import { getCsrfToken } from "../api/api";
+import { getCsrfToken } from "./api/api";
 import Dashboard from "./components/Dashboard";
 import LoginForm from "./components/LoginForm";
 import PreferenceForm from "./components/PreferenceForm";
