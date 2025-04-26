@@ -9,6 +9,8 @@ const api = axios.create({
     ? 'https://ace-scanner-backend.onrender.com/api/'
     : 'http://localhost:8000/api/',
   withCredentials: true,
+  xsrfCookieName: "csrftoken",      // <--- force axios to match Django cookie name
+  xsrfHeaderName: "X-CSRFToken",    // <--- force axios to match Django header name
 });
 
 // 3. Auto-inject CSRF token on safe methods

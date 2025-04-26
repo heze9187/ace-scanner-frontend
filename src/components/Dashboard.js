@@ -101,8 +101,7 @@ function Dashboard({ handleLogout }) {
   const runScrape = async () => {
     try {
       setScraping(true);
-      await getCsrfToken(); // Fetch CSRF cookie (Axios will auto-attach it)
-  
+
       await api.post("scrape/"); // No need to set headers manually!
   
       await fetchAvailabilities();
