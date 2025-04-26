@@ -27,27 +27,9 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await getCsrfToken();  // 1. First get CSRF cookie
+      await getCsrfToken();  // Ensure CSRF cookie exists
   
-      const csrfToken = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("csrftoken="))
-        ?.split("=")[1];
-  
-      if (!csrfToken) {
-        throw new Error("No CSRF token found in cookies!");
-      }
-  
-      await api.post(
-        "auth/logout/",
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",  // <--- important!
-            "X-CSRFToken": csrfToken,             // <--- important!
-          },
-        }
-      );
+      await api.post("auth/logout/");  // Axios automatically sends cookies + headers
   
       setIsAuthenticated(false);
     } catch (error) {
