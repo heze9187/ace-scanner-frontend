@@ -13,30 +13,12 @@ function SignupForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await getCsrfToken(); // 1. First fetch CSRF cookie
+      await getCsrfToken(); // First fetch CSRF cookie
   
-      const csrfToken = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("csrftoken="))
-        ?.split("=")[1];
-  
-      if (!csrfToken) {
-        throw new Error("No CSRF token found in cookies!");
-      }
-  
-      await api.post(
-        "signup/",
-        { username, password },
-        {
-          headers: {
-            "Content-Type": "application/json",  // <- must set
-            "X-CSRFToken": csrfToken,             // <- must set
-          },
-        }
-      );
+      await api.post("signup/", { username, password });
   
       alert("Signup successful! Please log in.");
-      navigate("/login"); // Redirect to login page
+      navigate("/login"); // Redirect to login after signup
     } catch (error) {
       console.error("Signup failed:", error);
       alert("Signup failed. Username might already exist.");

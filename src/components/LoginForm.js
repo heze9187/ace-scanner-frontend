@@ -15,27 +15,9 @@ function LoginForm({ onLoginSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await getCsrfToken();  // 1. First fetch CSRF cookie
+      await getCsrfToken();  // Fetch CSRF cookie first
   
-      const csrfToken = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("csrftoken="))
-        ?.split("=")[1];
-  
-      if (!csrfToken) {
-        throw new Error("No CSRF token found in cookies!");
-      }
-  
-      await api.post(
-        'auth/login/',
-        { username, password },
-        {
-          headers: {
-            "Content-Type": "application/json",  // <- Must include this
-            "X-CSRFToken": csrfToken,             // <- And this
-          },
-        }
-      );
+      await api.post('auth/login/', { username, password });
   
       onLoginSuccess();
     } catch (error) {
@@ -43,7 +25,7 @@ function LoginForm({ onLoginSuccess }) {
       alert('Login failed. Please check your username/password.');
     }
   };
-  
+
   return (
     <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
       <Row className="w-100 justify-content-center">

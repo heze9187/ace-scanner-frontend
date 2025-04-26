@@ -87,17 +87,10 @@ function Dashboard({ handleLogout }) {
 
   const handleDeletePreference = async (id) => {
     try {
-      const csrfToken = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("csrftoken="))
-        ?.split("=")[1];
-
-      await api.delete(`preferences/${id}/`, {
-        headers: {
-          "X-CSRFToken": csrfToken,
-        },
-      });
-
+      await getCsrfToken(); // First fetch CSRF cookie
+  
+      await api.delete(`preferences/${id}/`); // No manual headers needed
+  
       fetchPreferences(); // Refresh after delete
     } catch (error) {
       console.error("Error deleting preference:", error);
@@ -108,25 +101,10 @@ function Dashboard({ handleLogout }) {
   const runScrape = async () => {
     try {
       setScraping(true);
-
-      await getCsrfToken();
-
-      const csrfToken = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("csrftoken="))
-        ?.split("=")[1];
-
-      await api.post(
-        "scrape/",
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": csrfToken,
-          },
-        }
-      );
-
+      await getCsrfToken(); // Fetch CSRF cookie (Axios will auto-attach it)
+  
+      await api.post("scrape/"); // No need to set headers manually!
+  
       await fetchAvailabilities();
     } catch (error) {
       console.error("Error running scrape:", error);

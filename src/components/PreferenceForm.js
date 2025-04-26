@@ -33,30 +33,17 @@ function PreferenceForm({ onSaveSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await getCsrfToken();
-      
-      const csrfToken = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("csrftoken="))
-        ?.split("=")[1];
-
-      await api.post(
-        "preferences/",
-        {
-          court_id: selectedCourt,
-          weekday_start: weekdayStart,
-          weekday_end: weekdayEnd,
-          weekend_start: weekendStart,
-          weekend_end: weekendEnd,
-          receive_email: true,
-        },
-        {
-          headers: {
-            "X-CSRFToken": csrfToken,
-          },
-        }
-      );
-
+      await getCsrfToken();  // Fetch CSRF cookie first
+  
+      await api.post("preferences/", {
+        court_id: selectedCourt,
+        weekday_start: weekdayStart,
+        weekday_end: weekdayEnd,
+        weekend_start: weekendStart,
+        weekend_end: weekendEnd,
+        receive_email: true,
+      });
+  
       onSaveSuccess();
       navigate('/dashboard');
     } catch (error) {
