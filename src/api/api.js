@@ -104,4 +104,6 @@ export const getCsrfToken = async () => {
   }
 };
 
+export { getCookie }
+
 export default api;

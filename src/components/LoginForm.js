@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api/api';
-import { getCsrfToken } from "../api/api"; 
+import { getCsrfToken, getCookie} from "../api/api"; 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
@@ -12,17 +12,33 @@ function LoginForm({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await getCsrfToken();  // Fetch CSRF cookie first
+      await getCsrfToken();  // Make sure cookie is there
   
-      await api.post('auth/login/', { username, password });
+      const csrfToken = getCookie('csrftoken');  // Manually read it
+  
+      if (!csrfToken) {
+        throw new Error("CSRF token missing!");
+      }
+  
+      await api.post(
+        "auth/login/",
+        { username, password },
+        {
+          headers: {
+            "X-CSRFToken": csrfToken,
+            "Content-Type": "application/json",
+          }
+        }
+      );
   
       onLoginSuccess();
     } catch (error) {
-      console.error('Login failed:', error);
-      alert('Login failed. Please check your username/password.');
+      console.error("Login failed:", error);
+      alert("Login failed. Please try again.");
     }
   };
 
