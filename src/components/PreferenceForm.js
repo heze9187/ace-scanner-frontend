@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import api from "../api/api";
-import { getCsrfToken } from "../api/api"; 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -33,8 +32,6 @@ function PreferenceForm({ onSaveSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await getCsrfToken();  // Fetch CSRF cookie first
-  
       await api.post("preferences/", {
         court_id: selectedCourt,
         weekday_start: weekdayStart,
