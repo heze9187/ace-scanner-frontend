@@ -28,7 +28,7 @@ function App() {
   const handleLogout = async () => {
     try {
       await getCsrfToken();  // Ensure CSRF cookie exists
-  
+
       await api.post("auth/logout/");  // Axios automatically sends cookies + headers
   
       setIsAuthenticated(false);
