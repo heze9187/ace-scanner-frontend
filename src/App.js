@@ -78,6 +78,7 @@ function App() {
   };
 
   useEffect(() => {
+    getCsrfToken();
     checkAuthentication();
   }, []);
 
