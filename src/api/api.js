@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-// Decide base URL based on environment
+// 1. Determine environment
 const isProduction = process.env.NODE_ENV === 'production';
 
+// 2. Create the axios instance
 const api = axios.create({
   baseURL: isProduction
     ? 'https://ace-scanner-backend.onrender.com/api/'
@@ -10,25 +11,20 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Global interceptor to auto-add CSRFToken
-api.interceptors.request.use((config) => {
-  const csrfToken = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('csrftoken='))
-    ?.split('=')[1];
+// 3. Auto-inject CSRF token on safe methods
+api.interceptors.request.use(async (config) => {
+  const csrfToken = getCookie('csrftoken');
 
-  if (csrfToken) {
+  if (csrfToken && ['post', 'put', 'patch', 'delete'].includes(config.method)) {
     config.headers['X-CSRFToken'] = csrfToken;
   }
 
-  // Always ensure Content-Type is application/json for POST/PUT/PATCH
-  if (!config.headers['Content-Type']) {
-    config.headers['Content-Type'] = 'application/json';
-  }
-
   return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
+// 4. Helper: Fetch CSRF token cookie
 export const getCsrfToken = async () => {
   try {
     await api.get('csrf/');
@@ -36,5 +32,15 @@ export const getCsrfToken = async () => {
     console.error('Error fetching CSRF token:', error);
   }
 };
+
+// 5. Helper: Read cookie
+function getCookie(name) {
+  const cookieValue = document.cookie
+    .split('; ')
+    .find(row => row.startsWith(name + '='))
+    ?.split('=')[1];
+
+  return cookieValue;
+}
 
 export default api;
