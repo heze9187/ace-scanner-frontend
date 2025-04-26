@@ -10,16 +10,27 @@ import Card from 'react-bootstrap/Card';
 function LoginForm({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [csrfReady, setCsrfReady] = useState(false); // <--- NEW
 
-  // ⭐ Fetch CSRF token when page loads
   useEffect(() => {
-    console.log("[LoginForm] Pre-fetching CSRF token...");
-    getCsrfToken();
+    async function prepareCsrf() {
+      console.log("[LoginForm] Fetching CSRF token...");
+      await getCsrfToken();
+      const token = getCookie('csrftoken');
+      if (token) {
+        console.log("[LoginForm] CSRF token ready ✅");
+        setCsrfReady(true);
+      } else {
+        console.error("[LoginForm] CSRF token still missing ❌");
+      }
+    }
+    prepareCsrf();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log("[LoginForm] document.cookie =", document.cookie);
       const csrfToken = getCookie('csrftoken');
 
       if (!csrfToken) {
@@ -74,9 +85,15 @@ function LoginForm({ onLoginSuccess }) {
                   />
                 </Form.Group>
 
-                <Button variant="primary" type="submit" className="w-100">
-                  Login
+                <Button 
+                  variant="primary" 
+                  type="submit" 
+                  className="w-100"
+                  disabled={!csrfReady} // ✨ Disable button until CSRF cookie is ready
+                >
+                  {csrfReady ? "Login" : "Loading..."}
                 </Button>
+
               </Form>
             </Card.Body>
           </Card>
