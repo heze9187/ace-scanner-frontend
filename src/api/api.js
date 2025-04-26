@@ -1,13 +1,12 @@
-// src/api/api.js
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: 'http://localhost:8000/api/',
-  withCredentials: true,  // important to send cookies
-});
+const isProduction = process.env.NODE_ENV === 'production';
 
-export async function getCsrfToken() {
-  await api.get('auth/login/');  // Django will set csrftoken cookie
-}
+const api = axios.create({
+  baseURL: isProduction
+    ? 'https://ace-scanner-backend.onrender.com/api/'
+    : 'http://localhost:8000/api/',
+  withCredentials: true,
+});
 
 export default api;
