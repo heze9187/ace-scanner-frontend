@@ -16,6 +16,9 @@ function LoginForm({ onLoginSuccess }) {
     async function prepareCsrf() {
       console.log("[LoginForm] Fetching CSRF token...");
       await getCsrfToken();
+
+      console.log("[LoginForm] document.cookie =", document.cookie);
+      
       const token = getCookie('csrftoken');
       if (token) {
         console.log("[LoginForm] CSRF token ready ✅");
@@ -30,7 +33,6 @@ function LoginForm({ onLoginSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("[LoginForm] document.cookie =", document.cookie);
       const csrfToken = getCookie('csrftoken');
 
       if (!csrfToken) {
