@@ -18,27 +18,33 @@ function Dashboard({ handleLogout }) {
 
   const getGroupedMatchedAvailabilities = () => {
     const grouped = {};
-  
+
     availabilities.forEach((availability) => {
       const availabilityDate = new Date(availability.date);
       const dayOfWeek = availabilityDate.getDay();
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-  
+
       const militaryTime = parseInt(
-        availability.time.replace(':', '').replace('AM', '').replace('PM', '')
+        availability.time.replace(":", "").replace("AM", "").replace("PM", "")
       ); // quick naive parse for now
-  
+
       preferences.forEach((pref) => {
         if (availability.court_name === pref.court.name) {
           if (isWeekend) {
-            if (militaryTime >= pref.weekend_start && militaryTime <= pref.weekend_end) {
+            if (
+              militaryTime >= pref.weekend_start &&
+              militaryTime <= pref.weekend_end
+            ) {
               if (!grouped[availability.court_name]) {
                 grouped[availability.court_name] = [];
               }
               grouped[availability.court_name].push(availability);
             }
           } else {
-            if (militaryTime >= pref.weekday_start && militaryTime <= pref.weekday_end) {
+            if (
+              militaryTime >= pref.weekday_start &&
+              militaryTime <= pref.weekday_end
+            ) {
               if (!grouped[availability.court_name]) {
                 grouped[availability.court_name] = [];
               }
@@ -48,7 +54,7 @@ function Dashboard({ handleLogout }) {
         }
       });
     });
-  
+
     return grouped;
   };
 
@@ -104,22 +110,27 @@ function Dashboard({ handleLogout }) {
       setScraping(true);
 
       await getCsrfToken();
-      
+
       const csrfToken = document.cookie
         .split("; ")
         .find((row) => row.startsWith("csrftoken="))
         ?.split("=")[1];
 
-      await api.post('scrape/', {}, {
-        headers: {
-          'X-CSRFToken': csrfToken,
+      await api.post(
+        "scrape/",
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+          },
         }
-      });
+      );
 
       await fetchAvailabilities();
     } catch (error) {
-      console.error('Error running scrape:', error);
-      alert('Failed to run scrape.');
+      console.error("Error running scrape:", error);
+      alert("Failed to run scrape.");
     } finally {
       setScraping(false);
     }
@@ -146,11 +157,7 @@ function Dashboard({ handleLogout }) {
           >
             Set Preferences
           </Button>
-          <Button 
-            variant="warning" 
-            onClick={runScrape} 
-            disabled={scraping}
-          >
+          <Button variant="warning" onClick={runScrape} disabled={scraping}>
             {scraping ? (
               <>
                 <Spinner
@@ -198,10 +205,12 @@ function Dashboard({ handleLogout }) {
                       <strong>Court:</strong> {pref.court.name}
                     </p>
                     <p>
-                      <strong>Weekdays:</strong> {pref.weekday_start}-{pref.weekday_end}
+                      <strong>Weekdays:</strong> {pref.weekday_start}-
+                      {pref.weekday_end}
                     </p>
                     <p>
-                      <strong>Weekends:</strong> {pref.weekend_start}-{pref.weekend_end}
+                      <strong>Weekends:</strong> {pref.weekend_start}-
+                      {pref.weekend_end}
                     </p>
                   </div>
                   <Button
@@ -219,26 +228,28 @@ function Dashboard({ handleLogout }) {
       </Row>
 
       <Row>
-  <Col>
-    <h2>Matched Available Courts 🎯</h2>
-    {Object.keys(getGroupedMatchedAvailabilities()).length === 0 ? (
-      <p className="text-muted">No matches found for your preferences.</p>
-    ) : (
-      Object.entries(getGroupedMatchedAvailabilities()).map(([courtName, slots]) => (
-        <div key={courtName} className="mb-4">
-          <h5 className="mt-3">{courtName}</h5>
-          <ListGroup>
-            {slots.map((slot, idx) => (
-              <ListGroup.Item key={idx}>
-                {slot.date} at {slot.time}
-              </ListGroup.Item>
-            ))}
-          </ListGroup>
-        </div>
-      ))
-    )}
-  </Col>
-</Row>
+        <Col>
+          <h2>Matched Available Courts 🎯</h2>
+          {Object.keys(getGroupedMatchedAvailabilities()).length === 0 ? (
+            <p className="text-muted">No matches found for your preferences.</p>
+          ) : (
+            Object.entries(getGroupedMatchedAvailabilities()).map(
+              ([courtName, slots]) => (
+                <div key={courtName} className="mb-4">
+                  <h5 className="mt-3">{courtName}</h5>
+                  <ListGroup>
+                    {slots.map((slot, idx) => (
+                      <ListGroup.Item key={idx}>
+                        {slot.date} at {slot.time}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </div>
+              )
+            )
+          )}
+        </Col>
+      </Row>
     </Container>
   );
 }

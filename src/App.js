@@ -26,9 +26,34 @@ function App() {
   };
 
   const handleLogout = async () => {
-    await getCsrfToken();
-    await api.post("auth/logout/");
-    setIsAuthenticated(false);
+    try {
+      await getCsrfToken();  // 1. First get CSRF cookie
+  
+      const csrfToken = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("csrftoken="))
+        ?.split("=")[1];
+  
+      if (!csrfToken) {
+        throw new Error("No CSRF token found in cookies!");
+      }
+  
+      await api.post(
+        "auth/logout/",
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",  // <--- important!
+            "X-CSRFToken": csrfToken,             // <--- important!
+          },
+        }
+      );
+  
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error("Logout failed:", error);
+      alert("Logout failed. Please try again.");
+    }
   };
 
   // Wrapper for PreferenceForm because it uses useNavigate
