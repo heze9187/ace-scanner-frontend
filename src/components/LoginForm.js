@@ -16,16 +16,8 @@ function LoginForm({ onLoginSuccess }) {
     async function prepareCsrf() {
       console.log("[LoginForm] Fetching CSRF token...");
       await getCsrfToken();
-
-      console.log("[LoginForm] document.cookie =", document.cookie);
-      
-      const token = getCookie('csrftoken');
-      if (token) {
-        console.log("[LoginForm] CSRF token ready ✅");
-        setCsrfReady(true);
-      } else {
-        console.error("[LoginForm] CSRF token still missing ❌");
-      }
+      console.log("[LoginForm] Fetched CSRF token, ready!");
+      setCsrfReady(true);
     }
     prepareCsrf();
   }, []);
@@ -33,23 +25,12 @@ function LoginForm({ onLoginSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const csrfToken = getCookie('csrftoken');
-
-      if (!csrfToken) {
-        throw new Error("CSRF token missing!");
+      if (!csrfReady) {
+        throw new Error("CSRF not ready yet!");
       }
-
-      await api.post(
-        "auth/login/",
-        { username, password },
-        {
-          headers: {
-            "X-CSRFToken": csrfToken,
-            "Content-Type": "application/json",
-          }
-        }
-      );
-
+  
+      await api.post("auth/login/", { username, password });
+  
       onLoginSuccess();
     } catch (error) {
       console.error("Login failed:", error);
