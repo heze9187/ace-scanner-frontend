@@ -79,31 +79,30 @@ const api = axios.create({
   xsrfHeaderName: 'X-CSRFToken',
 });
 
-// Interceptor: Only manually attach CSRF if running localhost
+// ✅ Always attach CSRF for unsafe methods (POST, PUT, etc)
 api.interceptors.request.use((config) => {
-  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-  if (isLocalhost) {
-    const csrfToken = getCookie('csrftoken');
-    if (csrfToken && ['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
-      config.headers['X-CSRFToken'] = csrfToken;
-    }
+  const csrfToken = getCookie('csrftoken');
+  if (csrfToken && ['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
+    config.headers['X-CSRFToken'] = csrfToken;
+    console.log('[request] Injected X-CSRFToken header ✅', csrfToken);
+  } else {
+    console.warn('[request] No CSRF token found ❌');
   }
-
   return config;
 }, (error) => {
   return Promise.reject(error);
 });
 
-// CSRF helper
+// Fetch CSRF
 export const getCsrfToken = async () => {
   try {
+    console.log('[csrf] Fetching CSRF token...');
     await api.get('csrf/');
+    console.log('[csrf] Fetched CSRF token ✅');
   } catch (error) {
-    console.error('Error fetching CSRF token:', error);
+    console.error('[csrf] Error fetching CSRF token ❌', error);
   }
 };
 
-export { getCookie }
-
+export { getCookie };
 export default api;
